@@ -24,16 +24,61 @@ public class NeuralNet
 	}
 
 	// construct untrained neural net with given layer architecture
-	public NeuralNet(int[] hiddenLayers)
+	public NeuralNet(int[] layers)
 	{
-		numLayers = hiddenLayers.length;
+		initializeLayers(layers);				
+		populateZero();
+	}
+
+	// copy the given neural network
+	public NeuralNet(NeuralNet copy)
+	{
+		int[] layers = copy.getLayers();
+		initializeLayers(layers);
+
+		double[][][] w = copy.getWeights();
+		double[][] b = copy.getBiases();
+
+		setWeights(w);
+		setBiases(b);
+	}
+
+	public int[] getLayers()
+	{
+		return layerSizes;
+	}
+
+	public double[][][] getWeights()
+	{
+		return weights;
+	}
+		
+	public double[][] getBiases()
+	{
+		return biases;
+	}
+
+	public void setWeights(double[][][] w)
+	{
+		weights = w;
+	}
+
+	public void setBiases(double[][] b)
+	{
+		biases = b;
+	}
+
+	// create input, output, and hidden layers
+	private void initializeLayers(int[] layers)
+	{
+		numLayers = layers.length;
 		layerSizes = new int[numLayers];
 		weights = new double[numLayers - 1][][];
 		biases = new double[numLayers - 1][];
 		
 		// initialize layerSizes
-		for(int i = 0; i < hiddenLayers.length; i++)
-			layerSizes[i] = hiddenLayers[i];
+		for(int i = 0; i < layers.length; i++)
+			layerSizes[i] = layers[i];
 
 		// create weight and bias layers
 		for(int i = 0; i < numLayers - 1; i++)
@@ -41,8 +86,25 @@ public class NeuralNet
 			weights[i] = new double[layerSizes[i + 1]][layerSizes[i]];
 			biases[i] = new double[layerSizes[i + 1]];
 		}
+	}
 
-		// populate weights and biases randomly with gaussian distribution
+	// populate weights and biases with 0
+	private void populateZero()
+	{
+		for(int i = 0; i < weights.length; i++)
+		{
+			for(int j = 0; j < weights[i].length; j++)
+			{
+				biases[i][j] = 0;						
+				for(int k = 0; k < weights[i][j].length; k++)
+					weights[i][j][k] = 0;					
+			}
+		}
+	}
+
+	// populate weights and biases randomly with gaussian distribution
+	private void populateRandom()
+	{
 		Random randNum = new Random();
 		for(int i = 0; i < weights.length; i++)
 		{
