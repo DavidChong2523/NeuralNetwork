@@ -24,6 +24,7 @@ public class NeuralNet
 	}
 
 	// construct untrained neural net with given layer architecture
+	// set weights and biases to 0
 	public NeuralNet(int[] layers)
 	{
 		initializeLayers(layers);				
@@ -125,7 +126,8 @@ public class NeuralNet
 		return input;
 	}
 
-	public void stochasticGradientDescent(double[][][] trainingData, double eta, int miniBatchSize, int epochs)
+	// perform stochastic gradient descent with L2 regularization
+	public void stochasticGradientDescent(double[][][] trainingData, double eta, int miniBatchSize, int epochs, double lamda)
 	{
 		for(int e = 0; e < epochs; e++)
 		{
@@ -136,7 +138,7 @@ public class NeuralNet
 				double[][][] miniBatch = new double[size][][];
 				for(int j = 0; j < miniBatch.length; j++)
 					miniBatch[j] = trainingData[i + j];
-				updateMiniBatch(miniBatch, eta); 
+				updateMiniBatch(miniBatch, eta, trainingData.length, lambda); 
 			}
 			
 			if(e % 10 == 0)
@@ -144,7 +146,7 @@ public class NeuralNet
 		}
 	}	
 
-	public void updateMiniBatch(double[][][] miniBatch, double eta)
+	public void updateMiniBatch(double[][][] miniBatch, double eta, int trainingSize, double lambda)
 	{
 		// initialize weightDelta and biasDelta
 		double[][][] weightDelta = new double[numLayers - 1][][];
@@ -183,7 +185,11 @@ public class NeuralNet
 			{
 				biases[i][j] -= (eta / miniBatch.length) * biasDelta[i][j];	
 				for(int k = 0; k < weights[i][j].length; k++)
-					weights[i][j][k] -= (eta / miniBatch.length) * weightDelta[i][j][k];
+				{
+					// add L2 regularization
+					double regularizer = (1 - (eta * lambda / trainingSize));
+					weights[i][j][k] = regularizer * weights[i][j][k] - (eta / miniBatch.length) * weightDelta[i][j][k];
+				}
 			}
 		}
 	}
