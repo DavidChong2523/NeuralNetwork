@@ -127,7 +127,7 @@ public class NeuralNet
 	}
 
 	// perform stochastic gradient descent with L2 regularization
-	public void stochasticGradientDescent(double[][][] trainingData, double eta, int miniBatchSize, int epochs, double lamda)
+	public void stochasticGradientDescent(double[][][] trainingData, double eta, int miniBatchSize, int epochs, double lambda)
 	{
 		for(int e = 0; e < epochs; e++)
 		{
